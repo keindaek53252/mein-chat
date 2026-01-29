@@ -3,478 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymer Chat - Gemeinsam Helfen</title>
+    <title>Safe Haven | Dein privater Raum</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap');
+
+        :root {
+            --soft-blue: #a5f3fc;
+            --deep-blue: #080a0f;
+            --accent: #22d3ee;
+            --glass: rgba(15, 23, 42, 0.9);
+            --border: rgba(34, 211, 238, 0.2);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #000000;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Totenkopf Hintergrund */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('skull.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        /* Popup Warnung */
-        .popup-overlay {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--deep-blue);
+            color: #f1f5f9;
+            height: 100vh;
             display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .ocean-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
         }
 
-        .popup-box {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            border: 5px solid #00ff00;
-            border-radius: 25px;
-            padding: 60px;
-            max-width: 700px;
+        /* Start-Bildschirm */
+        #setup {
+            width: 90%;
+            max-width: 450px;
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
             text-align: center;
-            box-shadow: 0 0 100px rgba(0, 255, 0, 0.8);
-            animation: popupSlide 0.5s;
+            backdrop-filter: blur(20px);
         }
 
-        @keyframes popupSlide {
-            from {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1em;
+            outline: none;
         }
 
-        .popup-box h2 {
-            color: #00ff00;
-            font-size: 50px;
-            margin-bottom: 30px;
-            text-shadow: 0 0 30px #00ff00;
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-            0%, 49%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .popup-text {
-            color: #ffffff;
-            font-size: 26px;
-            line-height: 1.8;
-            margin-bottom: 40px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .popup-button {
-            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-            color: #000000;
-            font-size: 28px;
-            font-weight: bold;
-            padding: 25px 60px;
+        .btn {
+            background: var(--accent);
+            color: #083344;
             border: none;
-            border-radius: 20px;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.6);
-            transition: all 0.3s;
+            width: 100%;
         }
 
-        .popup-button:hover {
-            transform: scale(1.15);
-            box-shadow: 0 0 60px rgba(0, 255, 0, 1);
-        }
-
-        /* Chat Container */
-        .chat-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            min-height: calc(100vh - 80px);
-            display: flex;
+        /* Chat-Bereich */
+        #chat-room {
+            display: none;
+            width: 95vw;
+            height: 92vh;
+            background: var(--glass);
+            border-radius: 30px;
             flex-direction: column;
+            border: 1px solid var(--border);
         }
 
-        /* Chat Header */
-        .chat-header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            border: 3px solid #00ff00;
-            border-radius: 15px 15px 0 0;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-        }
-
-        .chat-header h1 {
-            color: #00ff00;
-            font-size: 42px;
-            text-shadow: 0 0 20px #00ff00;
-            margin-bottom: 10px;
-        }
-
-        .chat-header p {
-            color: #cccccc;
-            font-size: 18px;
-        }
-
-        /* Chat Box */
-        .chat-box {
-            background: rgba(10, 10, 10, 0.9);
-            border-left: 3px solid #00ff00;
-            border-right: 3px solid #00ff00;
-            padding: 30px;
-            height: 500px;
-            overflow-y: auto;
-            flex-grow: 1;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Scrollbar Style */
-        .chat-box::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .chat-box::-webkit-scrollbar-track {
-            background: #0a0a0a;
-            border-radius: 10px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background: #00ff00;
-            border-radius: 10px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: #00cc00;
-        }
-
-        /* Chat Message */
-        .message {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin-bottom: 15px;
-            animation: messageSlide 0.3s;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
-        }
-
-        @keyframes messageSlide {
-            from {
-                transform: translateX(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .message-header {
+        .header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
         }
 
-        .message-user {
-            color: #00ff00;
-            font-weight: bold;
-            font-size: 16px;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-        }
-
-        .message-time {
-            color: #666666;
-            font-size: 14px;
-        }
-
-        .message-text {
-            color: #ffffff;
-            font-size: 16px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        /* Chat Input */
-        .chat-input-container {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            border: 3px solid #00ff00;
-            border-radius: 0 0 15px 15px;
-            padding: 25px;
+        .messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
         }
 
-        .username-input {
-            background-color: #0a0a0a;
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 15px;
-            color: #00ff00;
-            font-size: 16px;
-            width: 200px;
-            outline: none;
-            transition: all 0.3s;
+        .bubble {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            line-height: 1.4;
         }
 
-        .username-input:focus {
-            border-color: #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
-        }
+        .mine { align-self: flex-end; background: var(--accent); color: #083344; font-weight: 600; }
+        .other { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
 
-        .message-input {
-            background-color: #0a0a0a;
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 15px;
-            color: #ffffff;
-            font-size: 16px;
-            flex-grow: 1;
-            outline: none;
-            transition: all 0.3s;
-        }
+        .name-tag { font-size: 0.7em; margin-bottom: 4px; opacity: 0.7; display: block; }
 
-        .message-input:focus {
-            border-color: #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
-        }
-
-        .send-button {
-            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-            color: #000000;
-            border: none;
-            border-radius: 10px;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
-        }
-
-        .send-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
-        }
-
-        .send-button:active {
-            transform: scale(0.95);
-        }
-
-        /* Info Box */
-        .info-box {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 1000px;
-            text-align: center;
-        }
-
-        .info-box p {
-            color: #00ff00;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .chat-container {
-                padding: 10px;
-                margin: 20px auto;
-            }
-
-            .chat-header h1 {
-                font-size: 28px;
-            }
-
-            .chat-header p {
-                font-size: 14px;
-            }
-
-            .chat-box {
-                height: 400px;
-                padding: 15px;
-            }
-
-            .chat-input-container {
-                flex-direction: column;
-                padding: 15px;
-            }
-
-            .username-input {
-                width: 100%;
-            }
-
-            .popup-box {
-                padding: 40px 30px;
-                margin: 20px;
-            }
-
-            .popup-box h2 {
-                font-size: 36px;
-            }
-
-            .popup-text {
-                font-size: 20px;
-            }
+        .footer {
+            padding: 20px 30px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <!-- Popup Warnung -->
-    <div id="warningPopup" class="popup-overlay">
-        <div class="popup-box">
-            <h2>⚠️ HINWEIS ⚠️</h2>
-            <p class="popup-text">
-                Das ist nur eine Web, um Leuten anonym zu helfen.<br>
-                Jeder kann hier chatten und Unterstützung finden.
-            </p>
-            <button id="closePopup" class="popup-button">Verstanden ✓</button>
-        </div>
+
+    <div class="ocean-bg"></div>
+
+    <div id="setup">
+        <h2 style="margin-bottom: 20px; color: var(--soft-blue);">Wie möchtest du heißen?</h2>
+        <input type="text" id="userName" placeholder="Dein anonymer Name..." maxlength="15">
+        <button class="btn" onclick="join()">Chat betreten</button>
     </div>
 
-    <!-- Info Box -->
-    <div class="info-box">
-        <p>💬 Anonymer Chat - Hier können alle miteinander reden</p>
-        <p>🤝 Zusammen sind wir stärker - Viel Erfolg!</p>
-    </div>
-
-    <!-- Chat Container -->
-    <div class="chat-container">
-        <!-- Chat Header -->
-        <div class="chat-header">
-            <h1>💬 Anonymer Chat</h1>
-            <p>Hier könnt ihr miteinander reden und euch gegenseitig helfen</p>
-        </div>
-
-        <!-- Chat Box -->
-        <div class="chat-box" id="chatBox">
-            <div class="message">
-                <div class="message-header">
-                    <span class="message-user">System</span>
-                    <span class="message-time">Jetzt</span>
-                </div>
-                <div class="message-text">Willkommen im anonymen Chat! Schreib eine Nachricht und hilf anderen. 🤝</div>
+    <div id="chat-room">
+        <div class="header">
+            <div>
+                <span id="displayMyName" style="color: var(--accent); font-weight: bold;"></span>
+                <span style="opacity: 0.5; font-size: 0.8em; margin-left: 10px;">(Privater Modus)</span>
             </div>
+            <button onclick="location.reload()" style="background:none; border:none; color:#555; cursor:pointer;">Namen ändern</button>
         </div>
-
-        <!-- Chat Input -->
-        <div class="chat-input-container">
-            <input type="text" class="username-input" id="usernameInput" placeholder="Dein Name..." maxlength="20">
-            <input type="text" class="message-input" id="messageInput" placeholder="Schreibe eine Nachricht..." maxlength="500">
-            <button class="send-button" id="sendButton">Senden 📤</button>
+        <div class="messages" id="chatBox">
+            <div class="bubble other">System: Willkommen im sicheren Raum. Du kannst jetzt schreiben.</div>
+        </div>
+        <div class="footer">
+            <input type="text" id="msgInput" placeholder="Nachricht schreiben..." style="margin-bottom:0;">
+            <button class="btn" onclick="send()" style="width: auto;">Senden 🕊️</button>
         </div>
     </div>
 
     <script>
-        // Popup funktionen
-        window.addEventListener('load', function() {
-            document.getElementById('warningPopup').style.display = 'flex';
-        });
+        let myName = "Anonym";
 
-        document.getElementById('closePopup').addEventListener('click', function() {
-            document.getElementById('warningPopup').style.display = 'none';
-        });
-
-        document.getElementById('warningPopup').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
+        function join() {
+            const nameInput = document.getElementById('userName').value.trim();
+            if(nameInput !== "") {
+                myName = nameInput;
+                document.getElementById('displayMyName').innerText = myName;
+                document.getElementById('setup').style.display = 'none';
+                document.getElementById('chat-room').style.display = 'flex';
             }
-        });
-
-        // Chat Funktionen
-        const chatBox = document.getElementById('chatBox');
-        const messageInput = document.getElementById('messageInput');
-        const usernameInput = document.getElementById('usernameInput');
-        const sendButton = document.getElementById('sendButton');
-
-        // Funktion um Zeit zu bekommen
-        function getCurrentTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${hours}:${minutes}`;
         }
 
-        // Funktion um Nachricht zu senden
-        function sendMessage() {
-            const messageText = messageInput.value.trim();
-            const username = usernameInput.value.trim() || 'Anonym';
-
-            if (messageText === '') return;
-
-            // Erstelle neue Nachricht
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span class="message-user">${username}</span>
-                    <span class="message-time">${getCurrentTime()}</span>
-                </div>
-                <div class="message-text">${messageText}</div>
-            `;
-
-            // Füge Nachricht hinzu
-            chatBox.appendChild(messageDiv);
-
-            // Scroll nach unten
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Leere Input
-            messageInput.value = '';
-            messageInput.focus();
+        function send() {
+            const input = document.getElementById('msgInput');
+            const box = document.getElementById('chatBox');
+            if(input.value.trim() !== "") {
+                const div = document.createElement('div');
+                div.className = 'bubble mine';
+                div.innerHTML = `<span class="name-tag">${myName}</span>${input.value}`;
+                box.appendChild(div);
+                input.value = "";
+                box.scrollTop = box.scrollHeight;
+            }
         }
 
-        // Event Listeners
-        sendButton.addEventListener('click', sendMessage);
-
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        // Focus auf Message Input nach Popup
-        document.getElementById('closePopup').addEventListener('click', function() {
-            setTimeout(() => {
-                messageInput.focus();
-            }, 500);
+        document.getElementById('msgInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') send();
         });
     </script>
 </body>
 </html>
+
